@@ -1255,7 +1255,6 @@ html[data-theme=light] #activation-screen > div > div:last-child{background:rgba
     <div style="text-align:center;margin-bottom:28px">
       <div style="width:72px;height:72px;background:var(--surface);border:1.5px solid var(--brand-border);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px">🎓</div>
       <div style="font-size:24px;font-weight:900;color:var(--brand-light);letter-spacing:-0.5px">معهدي</div>
-      <div style="font-size:10px;color:var(--text-3);margin-top:4px;letter-spacing:3px;text-transform:uppercase">نظام الإدارة المتكامل</div>
     </div>
 
     <!-- البطاقة الرئيسية -->
@@ -1332,7 +1331,6 @@ html[data-theme=light] #activation-screen > div > div:last-child{background:rgba
       <div class="sidebar-icon" style="display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f0c45c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
       <div>
         <div class="sidebar-name">معهدي</div>
-        <div class="sidebar-sub">نظام الإدارة المتكامل</div>
       </div>
     </div>
     <div class="sidebar-inst" onclick="showPage('settings')" id="sidebar-inst-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a0aec0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> اضغط لتغيير اسم المعهد</div>
@@ -2904,37 +2902,12 @@ function renderDashboard(){
     }
   }
 
-  // ── بطاقة ترخيص التطبيق ──
-  var licBadge = document.getElementById('dash-license-badge');
-  var licExpiry = getLicenseExpiry();
-  if(licExpiry && licBadge){
-    var expYear = licExpiry.substring(0,4);
-    var expMonth = licExpiry.substring(4,6);
-    var expDay = licExpiry.substring(6,8);
-    var expDate = new Date(expYear+'-'+expMonth+'-'+expDay);
-    var nowMs = new Date();
-    var diffDays = Math.ceil((expDate - nowMs) / (1000*60*60*24));
-    var expDisplay = expDay+'/'+expMonth+'/'+expYear;
-    var icon, label, badgeColor;
-    if(diffDays < 0){
-      icon = '⛔';
-      label = 'انتهى الترخيص — تجديد مطلوب';
-      badgeColor = 'background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger)';
-    } else if(diffDays <= 7){
-      icon = '⚠️';
-      label = 'ينتهي خلال '+diffDays+' أيام ('+expDisplay+')';
-      badgeColor = 'background:var(--warning-bg);border:1px solid var(--warning-border);color:var(--warning)';
-    } else if(diffDays <= 30){
-      icon = '🔔';
-      label = 'ينتهي '+expDisplay+' ('+diffDays+' يوم)';
-      badgeColor = 'background:rgba(240,196,92,0.1);border:1px solid rgba(240,196,92,0.3);color:var(--gold)';
-    } else {
-      icon = '✅';
-      label = 'سارٍ حتى '+expDisplay;
-      badgeColor = 'background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.25);color:var(--success)';
-    }
-    licBadge.innerHTML = '<span style="margin-left:4px">'+icon+'</span><span>الترخيص: '+label+'</span>';
-    licBadge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:700;'+badgeColor;
+  // ── بطاقة الاشتراك — تُحدَّث عند تحميل Dashboard ──
+  if(currentUser){
+    fetchSubscription(currentUser.id).then(function(sub){
+      var ev = evalSubscription(sub);
+      updateLicenseBadge(ev);
+    });
   }
 
   // ── بطاقات الإحصاء ──
@@ -4898,45 +4871,153 @@ function toast(msg){var el=document.getElementById('toast');el.textContent=msg;e
 initTheme();
 
 // ══════════════════════════════════════════════
-// LICENSE SYSTEM — نظام الترخيص
+// SUPABASE — الإعداد
 // ══════════════════════════════════════════════
-var LICENSE_KEY = 'maahadi_license';
-var USED_CODES_KEY = 'maahadi_used_codes';
+var SUPABASE_URL  = 'https://sisviyfaecocomeiahse.supabase.co';
+var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpc3ZpeWZhZWNvY29tZWlhaHNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjA1NDgsImV4cCI6MjA5NTI5NjU0OH0.6yZdxy74b4Bh5vtc5sLWc9Q5UQ6ltZIx-Wfh65PQoYk';
+var _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+var currentUser = null;
 
-// التحقق من صلاحية الترخيص
-function checkLicense(){
-  var license = localStorage.getItem(LICENSE_KEY);
-  if(!license) return 'none';
-  try{
-    var lic = JSON.parse(license);
-    if(!lic.expiry) return 'none';
-    var exp = lic.expiry; // YYYYMMDD
-    var now = new Date();
-    var todayStr = now.getFullYear()+('0'+(now.getMonth()+1)).slice(-2)+('0'+now.getDate()).slice(-2);
-    if(todayStr > exp) return 'expired';
-    // حساب الأيام المتبقية
-    var expDate = new Date(exp.substring(0,4)+'-'+exp.substring(4,6)+'-'+exp.substring(6,8));
-    var diffMs = expDate - now;
-    var diffDays = Math.ceil(diffMs / (1000*60*60*24));
-    if(diffDays <= 7) return 'expiring_'+diffDays;
-    return 'valid';
-  } catch(e){ return 'none'; }
-}
+// domain وهمي لتحويل username → email
+var AUTH_DOMAIN = '@maahadi.local';
+function usernameToEmail(u){ return u.trim().toLowerCase() + AUTH_DOMAIN; }
 
-function getLicenseExpiry(){
-  var license = localStorage.getItem(LICENSE_KEY);
-  if(!license) return null;
-  try{
-    var lic = JSON.parse(license);
-    return lic.expiry;
+// ══════════════════════════════════════════════
+// نظام الاشتراك — مرتبط بالـ user_id في Supabase
+// ══════════════════════════════════════════════
+
+// جلب بيانات الاشتراك من Supabase للـ user الحالي
+async function fetchSubscription(userId){
+  try {
+    var res = await _supabase
+      .from('subscriptions')
+      .select('expires_at, plan, activated_at, code')
+      .eq('user_id', userId)
+      .single();
+    if(res.error || !res.data) return null;
+    return res.data;
   } catch(e){ return null; }
 }
 
-// تحديث حالة زر التفعيل
+// التحقق من حالة الاشتراك
+function evalSubscription(sub){
+  if(!sub || !sub.expires_at) return { status: 'none', daysLeft: 0 };
+  var now = new Date();
+  var exp = new Date(sub.expires_at);
+  var diffMs = exp - now;
+  var daysLeft = Math.ceil(diffMs / 86400000);
+  if(daysLeft <= 0) return { status: 'expired', daysLeft: 0, exp: exp };
+  if(daysLeft <= 7) return { status: 'expiring', daysLeft: daysLeft, exp: exp };
+  return { status: 'valid', daysLeft: daysLeft, exp: exp };
+}
+
+// تنسيق التاريخ للعرض
+function fmtDate(d){
+  if(!d) return '';
+  var dt = (d instanceof Date) ? d : new Date(d);
+  return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear();
+}
+
+// تفعيل كود الاشتراك — يحفظ في Supabase مرتبطاً بالـ user
+async function activateApp(){
+  var inputCode = document.getElementById('act-code-input').value.trim().toUpperCase();
+  var errEl = document.getElementById('act-error');
+  errEl.style.display = 'none';
+
+  if(!inputCode || inputCode.length < 4){
+    showActError('الكود قصير جداً');
+    return;
+  }
+  if(!currentUser){
+    showActError('يجب تسجيل الدخول أولاً');
+    return;
+  }
+
+  // ── 1. تفعيل زر التحميل ──
+  var btn = document.getElementById('act-activate-btn');
+  var origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'جاري التحقق...';
+
+  try {
+    // ── 2. تحقق من الكود في Supabase ──
+    var codeRes = await _supabase
+      .from('codes')
+      .select('*')
+      .eq('code', inputCode)
+      .single();
+
+    if(codeRes.error || !codeRes.data){
+      showActError('الكود غير صحيح — تواصل مع @Nageb_99');
+      btn.disabled = false; btn.textContent = origText;
+      return;
+    }
+
+    var codeData = codeRes.data;
+
+    // ── 3. تحقق: هل الكود مستخدم من يوزر آخر؟ ──
+    if(codeData.used && codeData.used_by && codeData.used_by !== currentUser.id){
+      showActError('هذا الكود مستخدم مسبقاً من حساب آخر');
+      btn.disabled = false; btn.textContent = origText;
+      return;
+    }
+
+    // ── 4. احسب تاريخ الانتهاء ──
+    // إذا كان هناك اشتراك سابق نفعّل وما انتهى — نُضيف الأيام فوقه
+    var existingSub = await fetchSubscription(currentUser.id);
+    var baseDate = new Date();
+    if(existingSub){
+      var existingExp = new Date(existingSub.expires_at);
+      if(existingExp > baseDate) baseDate = existingExp; // نُضيف فوق الباقي
+    }
+    var days = codeData.days || 30;
+    var expiresAt = new Date(baseDate);
+    expiresAt.setDate(expiresAt.getDate() + days);
+
+    // ── 5. حفظ الاشتراك في Supabase ──
+    var subRes = await _supabase
+      .from('subscriptions')
+      .upsert({
+        user_id: currentUser.id,
+        code: inputCode,
+        expires_at: expiresAt.toISOString(),
+        plan: codeData.plan || 'standard',
+        activated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+
+    if(subRes.error){
+      showActError('خطأ في الحفظ: ' + subRes.error.message);
+      btn.disabled = false; btn.textContent = origText;
+      return;
+    }
+
+    // ── 6. ضع علامة "مستخدم" على الكود ──
+    await _supabase
+      .from('codes')
+      .update({ used: true, used_by: currentUser.id, used_at: new Date().toISOString() })
+      .eq('code', inputCode);
+
+    // ── 7. أغلق شاشة التفعيل وابدأ التطبيق ──
+    document.getElementById('activation-screen').style.display = 'none';
+    startApp();
+    toast('تم التفعيل! ينتهي في ' + fmtDate(expiresAt) + ' (' + days + ' يوم)');
+
+  } catch(e){
+    showActError('حدث خطأ غير متوقع — حاول مجدداً');
+    btn.disabled = false; btn.textContent = origText;
+  }
+}
+
+function showActError(msg){
+  var errEl = document.getElementById('act-error');
+  errEl.textContent = msg;
+  errEl.style.cssText = 'display:block;margin-top:12px;padding:11px 14px;border-radius:12px;font-size:11px;text-align:center;font-weight:600;background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger)';
+}
+
 function updateActBtn(){
   var val = document.getElementById('act-code-input').value.trim();
   var btn = document.getElementById('act-activate-btn');
-  if(val.length >= 5){
+  if(val.length >= 4){
     btn.disabled = false;
     btn.style.background = 'linear-gradient(135deg,var(--brand-dark),var(--brand),var(--brand-light))';
     btn.style.color = '#1a1a00';
@@ -4951,295 +5032,79 @@ function updateActBtn(){
   }
 }
 
-// التحقق من الكود وتفعيله
-function activateApp(){
-  var inputCode = document.getElementById('act-code-input').value.trim().toUpperCase();
-  var errEl = document.getElementById('act-error');
-  errEl.style.display = 'none';
-
-  if(!inputCode || inputCode.length < 5){
-    errEl.textContent = 'الكود قصير جداً';
-    errEl.style.cssText = 'display:block;margin-top:12px;padding:11px 14px;border-radius:12px;font-size:11px;text-align:center;font-weight:600;background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger)';
-    return;
-  }
-
-  // التحقق من أن الكود لم يُستخدم
-  var usedCodes = JSON.parse(localStorage.getItem(USED_CODES_KEY)||'[]');
-  if(usedCodes.indexOf(inputCode) !== -1){
-    errEl.textContent = 'هذا الكود استُخدم مسبقاً — احصل على كود جديد';
-    errEl.style.cssText = 'display:block;margin-top:12px;padding:11px 14px;border-radius:12px;font-size:11px;text-align:center;font-weight:600;background:var(--warning-bg);border:1px solid var(--warning-border);color:var(--warning)';
-    return;
-  }
-
-  // قائمة الأكواد الصالحة مع تواريخ انتهائها
-  var validCodes = buildValidCodes();
-  var foundExpiry = validCodes[inputCode];
-
-  if(!foundExpiry){
-    errEl.textContent = 'كود غير صحيح — تأكد من الكود أو تواصل مع @Nageb_99';
-    errEl.style.cssText = 'display:block;margin-top:12px;padding:11px 14px;border-radius:12px;font-size:11px;text-align:center;font-weight:600;background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger)';
-    var inp = document.getElementById('act-code-input');
-    inp.style.borderColor = 'var(--danger)';
-    inp.disabled = true;
-    setTimeout(function(){
-      inp.disabled = false;
-      inp.style.borderColor = 'var(--border)';
-    }, 2000);
-    return;
-  }
-
-  // حفظ الترخيص
-  var nowDate = new Date();
-  var todayStr = nowDate.getFullYear()+'-'+('0'+(nowDate.getMonth()+1)).slice(-2)+'-'+('0'+nowDate.getDate()).slice(-2);
-  localStorage.setItem(LICENSE_KEY, JSON.stringify({expiry:foundExpiry, activatedAt:todayStr, code:inputCode}));
-  usedCodes.push(inputCode);
-  localStorage.setItem(USED_CODES_KEY, JSON.stringify(usedCodes));
-
-  // حساب الأيام
-  var d = foundExpiry;
-  var expDate = new Date(d.substring(0,4)+'-'+d.substring(4,6)+'-'+d.substring(6,8));
-  var diffDays = Math.ceil((expDate - nowDate) / (1000*60*60*24));
-  var expDisplay = d.substring(6,8)+'/'+d.substring(4,6)+'/'+d.substring(0,4);
-
-  document.getElementById('activation-screen').style.display = 'none';
-  startApp();
-  toast('تم التفعيل! ينتهي في '+expDisplay+' ('+diffDays+' يوم)');
-}
-
-function buildValidCodes(){
-  // أكواد الاشتراك — كل كود مرتبط بتاريخ انتهاء (YYYYMMDD)
-  // باقة شهر واحد (تجريبية)
-  // باقة 3 أشهر
-  // باقة 6 أشهر
-  // باقة سنة كاملة
-  return {
-    'TRIAL1': '20260922',
-    'TRIAL2': '20260922',
-    'TRIAL3': '20260922',
-    'START1': '20261122',
-    'START2': '20261122',
-    'START3': '20261122',
-    'GOLD01': '20270222',
-    'GOLD02': '20270222',
-    'GOLD03': '20270222',
-    'PREM01': '20270822',
-    'PREM02': '20270822',
-    'PREM03': '20270822',
-    'B5C0B7': '20260922',
-    '400BEC': '20261122',
-    'F6CB64': '20270222',
-    '4FC14E': '20270822',
-  };
-}
-
-function md5Hash(str){
-  // تطبيق MD5 بسيط
-  function safeAdd(x,y){
-    var lsw=(x&0xFFFF)+(y&0xFFFF);
-    var msw=(x>>16)+(y>>16)+(lsw>>16);
-    return(msw<<16)|(lsw&0xFFFF);
-  }
-  function bitRotateLeft(num,cnt){ return(num<<cnt)|(num>>>(32-cnt)); }
-  function md5cmn(q,a,b,x,s,t){ return safeAdd(bitRotateLeft(safeAdd(safeAdd(a,q),safeAdd(x,t)),s),b); }
-  function md5ff(a,b,c,d,x,s,t){ return md5cmn((b&c)|((~b)&d),a,b,x,s,t); }
-  function md5gg(a,b,c,d,x,s,t){ return md5cmn((b&d)|(c&(~d)),a,b,x,s,t); }
-  function md5hh(a,b,c,d,x,s,t){ return md5cmn(b^c^d,a,b,x,s,t); }
-  function md5ii(a,b,c,d,x,s,t){ return md5cmn(c^(b|(~d)),a,b,x,s,t); }
-
-  var bArray=[];
-  for(var i=0;i<str.length*8;i+=8){
-    bArray[i>>5]|=(str.charCodeAt(i/8)&0xFF)<<(i%32);
-  }
-  bArray[str.length*8>>5]|=0x80<<(str.length*8%32);
-  bArray[(((str.length*8+64)>>>9)<<4)+14]=str.length*8;
-
-  var a=1732584193,b=-271733879,c=-1732584194,d=271733878;
-  for(var i=0;i<bArray.length;i+=16){
-    var olda=a,oldb=b,oldc=c,oldd=d;
-    a=md5ff(a,b,c,d,bArray[i+0],7,-680876936);
-    d=md5ff(d,a,b,c,bArray[i+1],12,-389564586);
-    c=md5ff(c,d,a,b,bArray[i+2],17,606105819);
-    b=md5ff(b,c,d,a,bArray[i+3],22,-1044525330);
-    a=md5ff(a,b,c,d,bArray[i+4],7,-176418897);
-    d=md5ff(d,a,b,c,bArray[i+5],12,1200080426);
-    c=md5ff(c,d,a,b,bArray[i+6],17,-1473231341);
-    b=md5ff(b,c,d,a,bArray[i+7],22,-45705983);
-    a=md5ff(a,b,c,d,bArray[i+8],7,1770035416);
-    d=md5ff(d,a,b,c,bArray[i+9],12,-1958414417);
-    c=md5ff(c,d,a,b,bArray[i+10],17,-42063);
-    b=md5ff(b,c,d,a,bArray[i+11],22,-1990404162);
-    a=md5ff(a,b,c,d,bArray[i+12],7,1804603682);
-    d=md5ff(d,a,b,c,bArray[i+13],12,-40341101);
-    c=md5ff(c,d,a,b,bArray[i+14],17,-1502002290);
-    b=md5ff(b,c,d,a,bArray[i+15],22,1236535329);
-    a=md5gg(a,b,c,d,bArray[i+1],5,-165796510);
-    d=md5gg(d,a,b,c,bArray[i+6],9,-1069501632);
-    c=md5gg(c,d,a,b,bArray[i+11],14,643717713);
-    b=md5gg(b,c,d,a,bArray[i+0],20,-373897302);
-    a=md5gg(a,b,c,d,bArray[i+5],5,-701558691);
-    d=md5gg(d,a,b,c,bArray[i+10],9,38016083);
-    c=md5gg(c,d,a,b,bArray[i+15],14,-660478335);
-    b=md5gg(b,c,d,a,bArray[i+4],20,-405537848);
-    a=md5gg(a,b,c,d,bArray[i+9],5,568446438);
-    d=md5gg(d,a,b,c,bArray[i+14],9,-1019803690);
-    c=md5gg(c,d,a,b,bArray[i+3],14,-187363961);
-    b=md5gg(b,c,d,a,bArray[i+8],20,1163531501);
-    a=md5gg(a,b,c,d,bArray[i+13],5,-1444681467);
-    d=md5gg(d,a,b,c,bArray[i+2],9,-51403784);
-    c=md5gg(c,d,a,b,bArray[i+7],14,1735328473);
-    b=md5gg(b,c,d,a,bArray[i+12],20,-1926607734);
-    a=md5hh(a,b,c,d,bArray[i+5],4,-378558);
-    d=md5hh(d,a,b,c,bArray[i+8],11,-2022574463);
-    c=md5hh(c,d,a,b,bArray[i+11],16,1839030562);
-    b=md5hh(b,c,d,a,bArray[i+14],23,-35309556);
-    a=md5hh(a,b,c,d,bArray[i+1],4,-1530992060);
-    d=md5hh(d,a,b,c,bArray[i+4],11,1272893353);
-    c=md5hh(c,d,a,b,bArray[i+7],16,-155497632);
-    b=md5hh(b,c,d,a,bArray[i+10],23,-1094730640);
-    a=md5hh(a,b,c,d,bArray[i+13],4,681279174);
-    d=md5hh(d,a,b,c,bArray[i+0],11,-358537222);
-    c=md5hh(c,d,a,b,bArray[i+3],16,-722521979);
-    b=md5hh(b,c,d,a,bArray[i+6],23,76029189);
-    a=md5hh(a,b,c,d,bArray[i+9],4,-640364487);
-    d=md5hh(d,a,b,c,bArray[i+12],11,-421815835);
-    c=md5hh(c,d,a,b,bArray[i+15],16,530742520);
-    b=md5hh(b,c,d,a,bArray[i+2],23,-995338651);
-    a=md5ii(a,b,c,d,bArray[i+0],6,-198630844);
-    d=md5ii(d,a,b,c,bArray[i+7],10,1126891415);
-    c=md5ii(c,d,a,b,bArray[i+14],15,-1416354905);
-    b=md5ii(b,c,d,a,bArray[i+5],21,-57434055);
-    a=md5ii(a,b,c,d,bArray[i+12],6,1700485571);
-    d=md5ii(d,a,b,c,bArray[i+3],10,-1894986606);
-    c=md5ii(c,d,a,b,bArray[i+10],15,-1051523);
-    b=md5ii(b,c,d,a,bArray[i+1],21,-2054922799);
-    a=md5ii(a,b,c,d,bArray[i+8],6,1873313359);
-    d=md5ii(d,a,b,c,bArray[i+15],10,-30611744);
-    c=md5ii(c,d,a,b,bArray[i+6],15,-1560198380);
-    b=md5ii(b,c,d,a,bArray[i+13],21,1309151649);
-    a=md5ii(a,b,c,d,bArray[i+4],6,-145523070);
-    d=md5ii(d,a,b,c,bArray[i+11],10,-1120210379);
-    c=md5ii(c,d,a,b,bArray[i+2],15,718787259);
-    b=md5ii(b,c,d,a,bArray[i+9],21,-343485551);
-    a=safeAdd(a,olda);b=safeAdd(b,oldb);c=safeAdd(c,oldc);d=safeAdd(d,oldd);
-  }
-
-  var hex='';
-  var words=[a,b,c,d];
-  for(var i=0;i<4;i++){
-    for(var j=0;j<4;j++){
-      var byte_val=(words[i]>>(j*8))&0xFF;
-      hex+=('0'+byte_val.toString(16)).slice(-2);
-    }
-  }
-  return hex.substring(0,6).toUpperCase();
-}
-
-
-// دالة hash بسيطة تعمل بدون crypto
-function simpleHash(str){
-  var hash = 0;
-  var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  for(var i = 0; i < str.length; i++){
-    var ch = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + ch;
-    hash = hash & hash;
-  }
-  // تحويل لـ 8 أحرف
-  var result = '';
-  var h = Math.abs(hash);
-  for(var j = 0; j < 8; j++){
-    result = chars[h % chars.length] + result;
-    h = Math.floor(h / chars.length);
-  }
-  return result;
-}
-
 // إظهار شاشة التفعيل مع رسالة مناسبة
-function showActivationScreen(reason){
+function showActivationScreen(reason, daysLeft){
   var screen = document.getElementById('activation-screen');
-  var title = document.getElementById('act-title');
-  var sub = document.getElementById('act-sub');
+  var title  = document.getElementById('act-title');
+  var sub    = document.getElementById('act-sub');
   var expiryInfo = document.getElementById('act-expiry-info');
   var expiryText = document.getElementById('act-expiry-text');
 
-  // إزالة زر التخطي القديم إن وُجد
   var oldSkip = document.getElementById('act-skip-btn');
-  if(oldSkip){ oldSkip.parentNode.removeChild(oldSkip); }
+  if(oldSkip) oldSkip.parentNode.removeChild(oldSkip);
 
   if(reason === 'expired'){
     title.textContent = 'انتهى الاشتراك';
-    sub.textContent = 'يرجى تجديد الاشتراك للمتابعة';
+    sub.textContent   = 'يرجى تجديد الاشتراك للمتابعة';
     expiryInfo.style.cssText = 'display:block;border-radius:12px;padding:12px 14px;margin-bottom:18px;text-align:center;background:var(--danger-bg);border:1px solid var(--danger-border)';
-    expiryText.style.color = 'var(--danger)';
-    expiryText.textContent = 'انتهت صلاحية الترخيص — تواصل مع @Nageb_99 للتجديد';
-  } else if(reason && reason.indexOf('expiring') !== -1){
-    var days = reason.split('_')[1];
+    expiryText.style.color   = 'var(--danger)';
+    expiryText.textContent   = 'انتهت صلاحية الاشتراك — تواصل مع @Nageb_99 للتجديد';
+  } else if(reason === 'expiring'){
     title.textContent = 'الاشتراك ينتهي قريباً';
-    sub.textContent = 'أدخل كود التجديد أو تابع مؤقتاً';
+    sub.textContent   = 'أدخل كود التجديد أو تابع مؤقتاً';
     expiryInfo.style.cssText = 'display:block;border-radius:12px;padding:12px 14px;margin-bottom:18px;text-align:center;background:var(--warning-bg);border:1px solid var(--warning-border)';
-    expiryText.style.color = 'var(--warning)';
-    expiryText.textContent = 'ينتهي خلال ' + days + (days === '1' ? ' يوم' : ' أيام') + ' — يُنصح بالتجديد الآن';
+    expiryText.style.color   = 'var(--warning)';
+    expiryText.textContent   = 'ينتهي خلال ' + daysLeft + ' أيام — يُنصح بالتجديد الآن';
     var skipBtn = document.createElement('button');
     skipBtn.id = 'act-skip-btn';
     skipBtn.textContent = 'متابعة بدون تجديد';
     skipBtn.style.cssText = 'width:100%;margin-top:10px;padding:12px;background:transparent;border:1.5px solid var(--border);border-radius:14px;color:var(--text-2);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer';
-    skipBtn.onclick = function(){
-      screen.style.display = 'none';
-      startApp();
-    };
+    skipBtn.onclick = function(){ screen.style.display='none'; startApp(); };
     document.getElementById('act-activate-btn').insertAdjacentElement('afterend', skipBtn);
   } else {
     title.textContent = 'تفعيل التطبيق';
-    sub.textContent = 'أدخل كود الاشتراك للمتابعة';
+    sub.textContent   = 'أدخل كود الاشتراك للمتابعة';
     expiryInfo.style.display = 'none';
   }
 
-  screen.style.display = 'flex';
+  screen.style.display       = 'flex';
   screen.style.flexDirection = 'column';
-  screen.style.alignItems = 'center';
-  screen.style.justifyContent = 'center';
+  screen.style.alignItems    = 'center';
+  screen.style.justifyContent= 'center';
 }
 
-// نقطة الدخول الرئيسية — تحقق من الترخيص
-function checkAndStart(){
-  var status = checkLicense();
-  if(status === 'valid'){
-    startApp();
-  } else if(status === 'none' || status === 'expired'){
-    // أخفِ الـ splash وأظهر شاشة التفعيل
-    var splash = document.getElementById('splash');
-    if(splash) splash.style.display = 'none';
-    showActivationScreen(status);
-  } else if(status.indexOf('expiring') !== -1){
-    startApp();
-    setTimeout(function(){
-      var days = status.split('_')[1];
-      toast('تنبيه: ينتهي اشتراكك خلال ' + days + ' أيام');
-    }, 3000);
+// تحديث شارة الاشتراك في Dashboard
+function updateLicenseBadge(evalResult){
+  var badge = document.getElementById('dash-license-badge');
+  if(!badge) return;
+  if(evalResult.status === 'valid' || evalResult.status === 'expiring'){
+    var d = evalResult.daysLeft;
+    badge.style.display = 'inline-flex';
+    if(evalResult.status === 'expiring'){
+      badge.textContent = 'ينتهي خلال ' + d + ' يوم';
+      badge.style.background = 'var(--warning-bg)';
+      badge.style.borderColor = 'var(--warning-border)';
+      badge.style.color = 'var(--warning)';
+    } else {
+      badge.textContent = 'اشتراك نشط — ' + d + ' يوم';
+      badge.style.background = 'var(--success-bg)';
+      badge.style.borderColor = 'var(--success-border)';
+      badge.style.color = 'var(--success)';
+    }
+  } else {
+    badge.style.display = 'none';
   }
 }
 
-
 // ══════════════════════════════════════════════
-// SUPABASE — نظام المصادقة
+// AUTH — تسجيل الدخول والخروج
 // ══════════════════════════════════════════════
-var SUPABASE_URL  = 'https://sisviyfaecocomeiahse.supabase.co';
-var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpc3ZpeWZhZWNvY29tZWlhaHNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjA1NDgsImV4cCI6MjA5NTI5NjU0OH0.6yZdxy74b4Bh5vtc5sLWc9Q5UQ6ltZIx-Wfh65PQoYk';
 
-var _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-var currentUser = null;
-
-// ── الـ domain الوهمي — يُحوّل username إلى email داخلياً ──
-var AUTH_DOMAIN = '@maahadi.local';
-function usernameToEmail(username){ return username.trim().toLowerCase() + AUTH_DOMAIN; }
-
-// ── إظهار / إخفاء الشاشات ──
 function showAuthLoader(){ document.getElementById('auth-loader').classList.remove('hidden'); }
 function hideAuthLoader(){ document.getElementById('auth-loader').classList.add('hidden'); }
 function showLoginScreen(){ document.getElementById('login-screen').classList.remove('hidden'); document.getElementById('app').style.display='none'; }
 function showApp(){ document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app').style.display=''; }
 
-// ── تحديث اسم المستخدم في الـ sidebar ──
 function updateUserInfo(user){
   var el = document.getElementById('sidebar-user-email');
   if(el && user){
@@ -5248,7 +5113,6 @@ function updateUserInfo(user){
   }
 }
 
-// ── تسجيل الدخول ──
 async function doLogin(){
   var username = document.getElementById('login-username').value.trim();
   var password = document.getElementById('login-password').value;
@@ -5266,28 +5130,25 @@ async function doLogin(){
   btn.disabled = true;
   btn.textContent = 'جاري تسجيل الدخول...';
 
-  var email = usernameToEmail(username);
+  var email  = usernameToEmail(username);
   var result = await _supabase.auth.signInWithPassword({ email, password });
 
   btn.disabled = false;
   btn.textContent = 'تسجيل الدخول';
 
   if(result.error){
-    var msg = result.error.message;
-    msg = 'اسم المستخدم أو كلمة المرور غير صحيحة';
-    errEl.textContent = msg;
+    errEl.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
     errEl.classList.add('show');
     return;
   }
 
-  // نجح تسجيل الدخول
   currentUser = result.data.user;
   updateUserInfo(currentUser);
   showApp();
-  startApp();
+  // بعد تسجيل الدخول: تحقق من الاشتراك
+  await checkAndStart();
 }
 
-// ── تسجيل الخروج ──
 async function doLogout(){
   if(!confirm('هل تريد تسجيل الخروج؟')) return;
   await _supabase.auth.signOut();
@@ -5295,9 +5156,61 @@ async function doLogout(){
   location.reload();
 }
 
-// ── فحص الجلسة عند التحميل ──
+// ══════════════════════════════════════════════
+// نقطة الدخول — تحقق من الجلسة ثم الاشتراك
+// ══════════════════════════════════════════════
 
+// بعد التحقق من تسجيل الدخول → تحقق من الاشتراك
+async function checkAndStart(){
+  if(!currentUser) return;
 
+  var sub   = await fetchSubscription(currentUser.id);
+  var eval_ = evalSubscription(sub);
+
+  updateLicenseBadge(eval_);
+
+  if(eval_.status === 'valid'){
+    startApp();
+  } else if(eval_.status === 'expiring'){
+    startApp(); // يدخل لكن يظهر تحذير
+    setTimeout(function(){
+      toast('تنبيه: ينتهي اشتراكك خلال ' + eval_.daysLeft + ' أيام');
+    }, 2500);
+    // أيضاً أظهر شاشة التجديد
+    showActivationScreen('expiring', eval_.daysLeft);
+  } else if(eval_.status === 'expired'){
+    var splash = document.getElementById('splash');
+    if(splash) splash.style.display = 'none';
+    showActivationScreen('expired', 0);
+  } else {
+    // لا يوجد اشتراك
+    var splash = document.getElementById('splash');
+    if(splash) splash.style.display = 'none';
+    showActivationScreen('none', 0);
+  }
+}
+
+// فحص الجلسة عند فتح التطبيق
+async function checkSession(){
+  showAuthLoader();
+  try {
+    var resp = await _supabase.auth.getSession();
+    var data = resp.data;
+    if(data && data.session && data.session.user){
+      currentUser = data.session.user;
+      updateUserInfo(currentUser);
+      hideAuthLoader();
+      showApp();
+      await checkAndStart();
+    } else {
+      hideAuthLoader();
+      showLoginScreen();
+    }
+  } catch(e){
+    hideAuthLoader();
+    showLoginScreen();
+  }
+}
 
 // ══════════════════════════════════════════════
 // إعدادات الحساب — تغيير username وكلمة المرور
@@ -5306,22 +5219,15 @@ async function saveAccountSettings(){
   var newUsername = document.getElementById('new-username').value.trim();
   var newPassword = document.getElementById('new-password').value;
   var confirmPw   = document.getElementById('confirm-password').value;
-  var msgEl       = document.getElementById('account-msg');
 
-  msgEl.style.display = 'none';
-
-  // تحقق من وجود شيء للتغيير
   if(!newUsername && !newPassword){
     showAccountMsg('يرجى إدخال اسم مستخدم جديد أو كلمة مرور جديدة', 'error');
     return;
   }
-
-  // تحقق من تطابق كلمتي المرور
   if(newPassword && newPassword !== confirmPw){
     showAccountMsg('كلمتا المرور غير متطابقتين', 'error');
     return;
   }
-
   if(newPassword && newPassword.length < 6){
     showAccountMsg('كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'error');
     return;
@@ -5332,19 +5238,17 @@ async function saveAccountSettings(){
   if(newPassword) updates.password = newPassword;
 
   var result = await _supabase.auth.updateUser(updates);
-
   if(result.error){
     showAccountMsg('حدث خطأ: ' + result.error.message, 'error');
     return;
   }
 
-  // نجح التحديث
   currentUser = result.data.user;
   updateUserInfo(currentUser);
-  document.getElementById('new-username').value  = '';
-  document.getElementById('new-password').value  = '';
+  document.getElementById('new-username').value   = '';
+  document.getElementById('new-password').value   = '';
   document.getElementById('confirm-password').value = '';
-  showAccountMsg('✅ تم تحديث بيانات الحساب بنجاح!', 'success');
+  showAccountMsg('تم تحديث بيانات الحساب بنجاح!', 'success');
 }
 
 function showAccountMsg(msg, type){
@@ -5353,56 +5257,23 @@ function showAccountMsg(msg, type){
   el.textContent = msg;
   el.style.display = 'block';
   if(type === 'success'){
-    el.style.background = 'rgba(80,200,80,.12)';
-    el.style.border = '1px solid rgba(80,200,80,.3)';
-    el.style.color = '#80dd80';
+    el.style.cssText = 'display:block;padding:10px 14px;border-radius:10px;background:rgba(80,200,80,.12);border:1px solid rgba(80,200,80,.3);color:#80dd80;font-size:12px;margin-top:10px';
   } else {
-    el.style.background = 'rgba(255,80,80,.12)';
-    el.style.border = '1px solid rgba(255,80,80,.3)';
-    el.style.color = '#ff8888';
+    el.style.cssText = 'display:block;padding:10px 14px;border-radius:10px;background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.3);color:#ff8888;font-size:12px;margin-top:10px';
   }
   setTimeout(function(){ el.style.display='none'; }, 4000);
 }
 
-async function checkSession(){
-  showAuthLoader();
-  try {
-    var { data } = await _supabase.auth.getSession();
-    if(data && data.session && data.session.user){
-      currentUser = data.session.user;
-      updateUserInfo(currentUser);
-      hideAuthLoader();
-      showApp();
-      startApp();
-    } else {
-      hideAuthLoader();
-      showLoginScreen();
-    }
-  } catch(e) {
-    hideAuthLoader();
-    showLoginScreen();
-  }
-}
-
-// ── السماح بالضغط على Enter في حقل كلمة المرور ──
+// Enter key في login
 document.addEventListener('DOMContentLoaded', function(){
   var pwInput = document.getElementById('login-password');
-  if(pwInput){
-    pwInput.addEventListener('keydown', function(e){
-      if(e.key === 'Enter') doLogin();
-    });
-  }
+  if(pwInput) pwInput.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
   var unInput = document.getElementById('login-username');
-  if(unInput){
-    unInput.addEventListener('keydown', function(e){
-      if(e.key === 'Enter') document.getElementById('login-password').focus();
-    });
-  }
+  if(unInput) unInput.addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('login-password').focus(); });
 });
 
 function startApp(){
-  // لا splash
-  try{ initDB(); }catch(e){ console.warn('DB init error:',e); }
+  try{ initDB(); }catch(e){ console.warn('DB init:',e); }
   updateInstName();
   setInterval(checkPendingNotifications,60000);
   checkPendingNotifications();
