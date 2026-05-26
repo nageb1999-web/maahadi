@@ -5111,15 +5111,15 @@ function updateUserInfo(user){
 
 // ── تسجيل الدخول ──
 async function doLogin(){
-  var email    = document.getElementById('login-email').value.trim();
+  var username = document.getElementById('login-username').value.trim();
   var password = document.getElementById('login-password').value;
   var errEl    = document.getElementById('login-error-msg');
   var btn      = document.getElementById('login-submit-btn');
 
   errEl.classList.remove('show');
 
-  if(!email || !password){
-    errEl.textContent = 'يرجى إدخال البريد الإلكتروني وكلمة المرور';
+  if(!username || !password){
+    errEl.textContent = 'يرجى إدخال اسم المستخدم وكلمة المرور';
     errEl.classList.add('show');
     return;
   }
@@ -5127,6 +5127,7 @@ async function doLogin(){
   btn.disabled = true;
   btn.textContent = 'جاري تسجيل الدخول...';
 
+  var email = usernameToEmail(username);
   var result = await _supabase.auth.signInWithPassword({ email, password });
 
   btn.disabled = false;
