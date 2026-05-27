@@ -639,57 +639,7 @@ tr:hover td{background:var(--surface-hover);}
  color:var(--text);letter-spacing:-0.3px;
 }
 .sec-actions{display:flex;gap:8px;flex-wrap:wrap;}
-/* ── شريط أزرار الإجراءات ── */
-.page-actions-bar{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px 28px 16px;
-  flex-wrap:wrap;
-}
-.page-action-btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 20px;
-  border-radius:12px;
-  font-family:inherit;font-size:13px;font-weight:700;
-  cursor:pointer;
-  border:1px solid var(--border-strong);
-  background:var(--surface);
-  color:var(--text-2);
-  transition:all .2s;
-  min-height:40px;
-}
-.page-action-btn:hover{
-  background:var(--surface-hover);
-  border-color:var(--brand-border);
-  color:var(--text);
-  transform:translateY(-1px);
-}
-.page-action-btn.primary{
-  background:linear-gradient(180deg,#4a3520 0%,#3a2a18 50%,#2e2010 100%);
-  color:#d4b896;
-  border:1px solid rgba(255,255,255,.07);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 8px rgba(0,0,0,.25);
-}
-.page-action-btn.primary:hover{
-  filter:brightness(1.12);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 4px 14px rgba(0,0,0,.30);
-}
-html[data-theme=light] .page-action-btn.primary{
-  background:linear-gradient(180deg,#5a4535 0%,#4a3828 50%,#3a2c1e 100%);
-  color:#e8d9c4;
-  border:1px solid rgba(30,18,8,.22);
-}
-html[data-theme=light] .page-action-btn{
-  background:var(--surface);
-  border-color:var(--border-strong);
-  color:var(--text-2);
-}
-html[data-theme=light] .page-action-btn:hover{
-  background:var(--surface-hover);
-  border-color:var(--brand-border);
-  color:var(--text);
-}
+/* page-actions-bar removed */
 
 
 /* ═══ SEARCH ═══ */
@@ -1858,9 +1808,7 @@ html[data-theme=light] .global-search-results{background:#ede7dd;}
  <div class="page" id="page-students">
  <div class="sec-header">
  <span class="sec-title"><span style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> قائمة الطلبة</span></span>
- </div>
- <div class="page-actions-bar">
-  <button class="page-action-btn primary" onclick="openModal('add-student')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> إضافة طالب</button>
+ <button class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:6px" onclick="openModal('add-student')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> إضافة طالب</button>
  </div>
 
  <div class="search-bar"><input class="search-input" type="text" placeholder="بحث بالاسم..." id="student-search" oninput="renderStudents()"></div>
@@ -1880,9 +1828,7 @@ html[data-theme=light] .global-search-results{background:#ede7dd;}
  <div class="page" id="page-results">
  <div class="sec-header">
  <span class="sec-title"><span style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg> النتائج والمحاولات</span></span>
- </div>
- <div class="page-actions-bar">
-  <button class="page-action-btn primary" onclick="openModal('add-result')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg> إضافة نتيجة</button>
+ <button class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:6px" onclick="openModal('add-result')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/></svg> إضافة نتيجة</button>
  </div>
 
  <div class="search-bar"><input class="search-input" type="text" placeholder="بحث..." id="result-search" oninput="renderResults()"></div>
@@ -1934,9 +1880,7 @@ html[data-theme=light] .global-search-results{background:#ede7dd;}
  <div class="page" id="page-teachers">
  <div class="sec-header">
  <span class="sec-title"><span style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg> المدرسون</span></span>
- </div>
- <div class="page-actions-bar">
-  <button class="page-action-btn primary" onclick="openModal('add-teacher')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg> إضافة مدرس</button>
+ <button class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:6px" onclick="openModal('add-teacher')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg> إضافة مدرس</button>
  </div>
 
  <div class="search-bar"><input class="search-input" type="text" placeholder="بحث..." id="teacher-search" oninput="renderTeachers()"></div>
@@ -1999,9 +1943,7 @@ html[data-theme=light] .global-search-results{background:#ede7dd;}
  <div class="page" id="page-expenses">
  <div class="sec-header">
  <span class="sec-title"><span style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg> المصروفات وصافي الربح</span></span>
- </div>
- <div class="page-actions-bar">
-  <button class="page-action-btn primary" onclick="openModal('add-expense')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg> إضافة مصروف</button>
+ <button class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:6px" onclick="openModal('add-expense')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg> إضافة مصروف</button>
  </div>
 
  <!-- Financial Summary -->
@@ -2026,9 +1968,7 @@ html[data-theme=light] .global-search-results{background:#ede7dd;}
  <div class="page" id="page-slips">
  <div class="sec-header">
  <span class="sec-title"><span style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> القصاصات</span></span>
- </div>
- <div class="page-actions-bar">
-  <button class="page-action-btn primary" onclick="openModal('add-slip')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="10" y1="15" x2="14" y2="15"/></svg> قصاصة جديدة</button>
+ <button class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:6px" onclick="openModal('add-slip')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="10" y1="15" x2="14" y2="15"/></svg> قصاصة جديدة</button>
  </div>
 
  <div class="search-bar">
