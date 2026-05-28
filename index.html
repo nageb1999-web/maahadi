@@ -3157,7 +3157,7 @@ function renderDashboard(){
  var days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
  var months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
  var dateStr=days[now.getDay()]+' '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
- document.getElementById('dash-greeting').textContent=greeting+' — '+(data.settings.instName&&data.settings.instName!=='معهدي'?data.settings.instName:'راصد');
+ document.getElementById('dash-greeting').textContent=greeting+' — '+(data.settings.instName||'راصد');
  document.getElementById('dash-date').textContent=dateStr;
 
  // ── شاشة الترحيب للمستخدم الجديد ──
@@ -5391,7 +5391,7 @@ function showApp(){ document.getElementById('login-screen').classList.add('hidde
 function updateUserInfo(user){
  var el=document.getElementById('sidebar-user-email');
  if(el&&user){
-  var uname=user.email?user.email.replace(AUTH_DOMAIN,'').replace('@rasid.local','').replace('@maahadi.local',''):'';
+  var uname=user.email?user.email.replace(AUTH_DOMAIN,'').replace(/@[a-z.]+$/,''):'';
   el.innerHTML='<span>'+uname+'</span>';
  }
 }
@@ -5557,7 +5557,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 function startApp(){
  try{ initDB(); }catch(e){ console.warn('DB init:',e); }
- if(data.settings&&(data.settings.instName==='معهدي'||!data.settings.instName)){
+ if(data.settings&&!data.settings.instName){
   data.settings.instName='راصد';
   save();
  }
